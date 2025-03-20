@@ -1,0 +1,20 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f0f0f0; /* Фоновый цвет страницы */
+    display: flex; /* Для вертикального центрирования */
+    justify-content: center; /* Горизонтальное центрирование */
+    align-items: center; /* Вертикальное центрирование */
+    height: 100vh; /* Высота страницы равна высоте экрана */
+  }
+  
+  .container {
+    max-width: 800px; /* Максимальная ширина контейнера */
+    padding: 20px; /* Внутренние отступы */
+    background-color: #f9f9f9; /* Фоновый цвет */
+    border: 1px solid #ddd; /* Рамка */
+    border-radius: 10px; /* Закругленные углы */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Тень */
+  }
+  

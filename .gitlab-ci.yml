@@ -1,0 +1,38 @@
+image: gradle:8.6-jdk17-alpine
+
+stages:
+  - build-backend
+  - test-backend
+  - build-frontend
+  - test-frontend
+
+build-backend:
+  stage: build-backend
+  script:
+    - cd devops-backend
+    - ./gradlew assemble
+  artifacts:
+    paths:
+      - backend/build/libs/*.jar
+
+test-backend:
+  stage: test-backend
+  script:
+    - cd devops-backend
+    - ./gradlew check
+  dependencies:
+    - build-backend
+  artifacts:
+    when: always
+    reports:
+      junit: backend/build/test-results/test/**/TEST-*.xml
+
+build-frontend:
+  stage: build-frontend
+  script:
+    - cd devops-front
+    - npm install
+    - npm run build
+  artifacts:
+    paths:
+      - frontend/dist/
