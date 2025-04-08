@@ -1,18 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { getCars } from './api';
 import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import './styles.css';
 
 const CarsList = () => {
   const [cars, setCars] = useState([]);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchCars = async () => {
       try {
         const data = await getCars();
         setCars(data);
+
+         // Добавляем проверку на пустой список
+         if (data.length === 0) {
+          navigate('/cars/add');
+        }
       } catch (error) {
         setError('Ошибка при загрузке данных');
         console.error('CarsList Error:', error);
