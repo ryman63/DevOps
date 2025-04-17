@@ -1,8 +1,10 @@
 name: Build Projects
 
 on:
-  push
-  pull_request
+  push:
+    branches: [ main, lab1 ]
+  pull_request:
+    branches: [ main, lab1 ]
 
 jobs:
   build-frontend:
