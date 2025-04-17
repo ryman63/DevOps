@@ -1,6 +1,12 @@
 name: Test Projects
 
 on:
+  push:
+    branches: [ main, lab1 ]
+  pull_request:
+    branches: [ main, lab1 ]
+
+jobs:
   test-backend:
     name: Test Backend
     runs-on: ubuntu-latest
