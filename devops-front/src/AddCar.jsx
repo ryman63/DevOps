@@ -18,7 +18,7 @@ const AddCar = () => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: name === 'year' ? parseInt(value) || '' : 
+      [name]: name === 'year' ? value || '' : 
              name === 'mileage' ? parseInt(value) || '' : value
     }));
   };

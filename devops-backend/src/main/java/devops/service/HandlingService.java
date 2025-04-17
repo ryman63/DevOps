@@ -17,6 +17,14 @@ public class HandlingService {
         return repository.getHandlingListByCarId(carId);
     }
 
+    public List<Handling> getListHandling() {
+        return repository.findAll();
+    }
+
+    public Handling getHandlingById(Long id){
+        return repository.getById(id);
+    }
+
     public Handling addHandling(Handling handling) {
         return repository.save(handling);
     }

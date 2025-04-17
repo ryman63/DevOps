@@ -19,22 +19,22 @@ public class NotificationController {
     }
 
     @PutMapping("/activate/{id}")
-    ResponseEntity<?> activateNotification(@PathVariable Long id) {
+    ResponseEntity<?> activateNotification(@PathVariable("id") Long id) {
         return ResponseEntity.ok(service.activate(id));
     }
 
     @PutMapping("/deactivate/{id}")
-    ResponseEntity<?> deactivateNotification(@PathVariable Long id) {
+    ResponseEntity<?> deactivateNotification(@PathVariable("id") Long id) {
         return ResponseEntity.ok(service.deactivate(id));
     }
 
     @PutMapping("/update/{id}")
-    ResponseEntity<?> updateNotification(@PathVariable Long id, @RequestBody Notification notification) {
+    ResponseEntity<?> updateNotification(@PathVariable("id") Long id, @RequestBody Notification notification) {
         return ResponseEntity.ok(service.updateNotification(notification, id));
     }
 
     @GetMapping("/{id}")
-    ResponseEntity<?> getNotification(@PathVariable Long id) {
+    ResponseEntity<?> getNotification(@PathVariable("id") Long id) {
         return ResponseEntity.ok(service.getNotification(id));
     }
 
@@ -44,7 +44,7 @@ public class NotificationController {
     }
 
     @DeleteMapping("/{id}")
-    ResponseEntity<?> deleteNotification(@PathVariable Long id) {
+    ResponseEntity<?> deleteNotification(@PathVariable("id") Long id) {
         service.removeNotification(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body("{}");
     }

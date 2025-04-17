@@ -1,5 +1,6 @@
 package devops.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.Getter;
@@ -7,6 +8,7 @@ import lombok.Setter;
 
 import java.util.Date;
 
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @Data
 @Entity
 @Table(name = "notification")
@@ -17,10 +19,8 @@ public class Notification {
     Long id;
 
     @ManyToOne
-    @JoinColumn(name = "car_id", nullable = false)
-    Car bindingCar;
-    String typeOfHandling;
+    @JoinColumn(name = "handling_id", nullable = false)
+    Handling handling;
     Date date;
-    String typeOfNotification;
     boolean isActive;
 }

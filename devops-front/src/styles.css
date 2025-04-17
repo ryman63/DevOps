@@ -17,4 +17,18 @@ body {
     border-radius: 10px; /* Закругленные углы */
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Тень */
   }
+
+  .delete-button {
+    margin-left: 10px;
+    padding: 2px 5px;
+    background-color: #ff4444;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+  }
+  
+  .delete-button:hover {
+    background-color: #cc0000;
+  }
   
