@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="test.CarServiceTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2025-04-17T10:41:36" hostname="DMITRIY" time="1.559">
+  <properties/>
+  <testcase name="getCars_shouldReturnList_whenExists()" classname="test.CarServiceTest" time="1.517"/>
+  <testcase name="getCars_shouldThrowException_whenNull()" classname="test.CarServiceTest" time="0.013"/>
+  <testcase name="removeCarById_shouldDeleteCar()" classname="test.CarServiceTest" time="0.01"/>
+  <testcase name="addCar_shouldSaveAndReturnCar()" classname="test.CarServiceTest" time="0.007"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[Mockito is currently self-attaching to enable the inline-mock-maker. This will no longer work in future releases of the JDK. Please add Mockito as an agent to your build what is described in Mockito's documentation: https://javadoc.io/doc/org.mockito/mockito-core/latest/org/mockito/Mockito.html#0.3
+WARNING: A Java agent has been loaded dynamically (C:\Users\Äìèòðèé\.gradle\caches\modules-2\files-2.1\net.bytebuddy\byte-buddy-agent\1.15.4\58e850dde88f3cf20f41f659440bef33f6c4fe02\byte-buddy-agent-1.15.4.jar)
+WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning
+WARNING: If a serviceability tool is not in use, please run with -Djdk.instrument.traceUsage for more information
+WARNING: Dynamic loading of agents will be disallowed by default in a future release
+]]></system-err>
+</testsuite>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="test.NotificationServiceTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2025-04-17T10:41:38" hostname="DMITRIY" time="0.077">
+  <properties/>
+  <testcase name="removeNotification_shouldDeleteNotification()" classname="test.NotificationServiceTest" time="0.066"/>
+  <testcase name="createNotification_shouldSaveAndReturnNotification()" classname="test.NotificationServiceTest" time="0.004"/>
+  <testcase name="getListNotifications_shouldReturnAll()" classname="test.NotificationServiceTest" time="0.005"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
