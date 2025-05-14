@@ -4,7 +4,7 @@ import { getCars } from './api';
 import { useNavigate } from 'react-router-dom';
 import './styles.css';
 
-const handlingTypes = [
+export const handlingTypes = [
   "Замена воздушного фильтра",
   "Замена салонного фильтра",
   "Замена масла двигателя",
@@ -42,8 +42,8 @@ const AddHandling = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await addHandling({ type: selectedType, car_id: parseInt(selectedCar), date: date, cost: cost });
-      navigate('/handlings');
+      await addHandling({ type: selectedType, car: { id: parseInt(selectedCar) }, date: date, cost: cost });
+      navigate('/handlings/${selectedCar}');
     } catch (error) {
       console.error('Ошибка при добавлении обслуживания:', error);
     }

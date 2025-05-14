@@ -1,6 +1,9 @@
 package devops.service;
 
+import devops.model.Handling;
 import devops.model.Notification;
+import devops.repository.CarRepository;
+import devops.repository.HandlingRepository;
 import devops.repository.NotificationRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -12,6 +15,8 @@ import java.util.List;
 public class NotificationService {
 
     private NotificationRepository repository;
+    private CarRepository carRepository;
+    private HandlingRepository handlingRepository;
 
     public Notification createNotification(Notification notification) {
         return repository.save(notification);
@@ -33,8 +38,7 @@ public class NotificationService {
         var dest = repository.getById(destId);
         dest.setActive(notification.isActive());
         dest.setDate(notification.getDate());
-        dest.setTypeOfNotification(notification.getTypeOfNotification());
-        dest.setBindingCar(notification.getBindingCar());
+        dest.setHandling(notification.getHandling());
         return repository.save(dest);
     }
 

@@ -19,19 +19,29 @@ public class HandlingController {
         return ResponseEntity.ok(service.addHandling(handling));
     }
 
-    @GetMapping("/{carId}")
-    ResponseEntity<?> GetHandlingList(@PathVariable Long carId) {
+    @GetMapping("/{id}")
+    ResponseEntity<?> GetHandling(@PathVariable("id") Long id) {
+        return ResponseEntity.ok(service.getHandlingById(id));
+    }
+
+    @GetMapping("/car/{carId}")
+    ResponseEntity<?> GetHandlingListByCar(@PathVariable("carId") Long carId) {
         return ResponseEntity.ok(service.getListHandlingByCarId(carId));
     }
 
-    @PutMapping("/{handlingId}")
-    ResponseEntity<?> UpdateHandling(@RequestBody Handling handling,@PathVariable Long handlingId) {
-        return ResponseEntity.ok(service.updateHandling(handling, handlingId));
+    @PutMapping("/{id}")
+    ResponseEntity<?> UpdateHandling(@RequestBody Handling handling,@PathVariable("id") Long id) {
+        return ResponseEntity.ok(service.updateHandling(handling, id));
     }
 
     @DeleteMapping("/{id}")
-    ResponseEntity<?> RemoveHandling(@PathVariable Long id) {
+    ResponseEntity<?> RemoveHandling(@PathVariable("id") Long id) {
         service.removeHandling(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body("{}");
+    }
+
+    @GetMapping("/")
+    ResponseEntity<?> GetHandlingList() {
+        return ResponseEntity.ok(service.getListHandling());
     }
 }

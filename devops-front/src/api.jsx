@@ -7,7 +7,7 @@ const api = axios.create({
 // Контроллер машин
 export const getCarById = async (id) => {
   try {
-    const response = await api.get(`/api/cars/id/${id}`);
+    const response = await api.get(`/api/cars/${id}`);
     return response.data;
   } catch (error) {
     console.error(error);
@@ -59,9 +59,27 @@ export const addHandling = async (handling) => {
   }
 };
 
-export const getHandlingList = async (carId) => {
+export const getHandlingListByCar = async (carId) => {
   try {
-    const response = await api.get(`/api/handlings/${carId}`);
+    const response = await api.get(`/api/handlings/car/${carId}`);
+    return response.data;
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+export const getHandlingList = async () => {
+  try {
+    const response = await api.get(`/api/handlings/`);
+    return response.data;
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+export const getHandling = async (id) => {
+  try {
+    const response = await api.get(`/api/handlings/${id}`);
     return response.data;
   } catch (error) {
     console.error(error);
@@ -88,7 +106,7 @@ export const removeHandling = async (id) => {
 // Контроллер уведомлений
 export const createNotification = async (notification) => {
   try {
-    const response = await api.post('/api/notifications/create', notification);
+    const response = await api.post(`/api/notifications/create`, notification);
     return response.data;
   } catch (error) {
     console.error(error);

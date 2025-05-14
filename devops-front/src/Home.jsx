@@ -15,7 +15,7 @@ const Home = () => {
           <Link to="/handlings/1">Список обслуживаний</Link>
         </li>
         <li>
-          <Link to="/notifications/create">Создать уведомление</Link>
+          <Link to="/notifications/">Создать уведомление</Link>
         </li>
       </ul>
     </div>

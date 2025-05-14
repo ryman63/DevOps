@@ -14,8 +14,8 @@ public class CarController {
 
     private CarService carService;
 
-    @GetMapping("/id")
-    public ResponseEntity<?> GetCar(@PathVariable Long id) {
+    @GetMapping("/{id}")
+    public ResponseEntity<?> GetCar(@PathVariable("id") Long id) {
         try{
             return ResponseEntity.ok(carService.getCarById(id));
         }
@@ -42,12 +42,12 @@ public class CarController {
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<?> UpdateCar(@RequestBody Car car, @PathVariable Long id) {
+    public ResponseEntity<?> UpdateCar(@RequestBody Car car, @PathVariable("id") Long id) {
         return ResponseEntity.ok(carService.updateCar(car, id));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> RemoveCar(@PathVariable Long id) {
+    public ResponseEntity<?> RemoveCar(@PathVariable("id") Long id) {
         carService.removeCarById(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body("{}");
     }

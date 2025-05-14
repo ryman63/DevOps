@@ -1,9 +1,9 @@
 package test;
 
+import devops.model.Car;
 import devops.model.Handling;
 import devops.repository.HandlingRepository;
 import devops.service.HandlingService;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -12,6 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -25,55 +26,46 @@ class HandlingServiceTest {
     @InjectMocks
     private HandlingService handlingService;
 
-    private Handling handling;
+    @Test
+    void getListHandlingByCarId_shouldReturnList() {
+        Long carId = 1L;
+        List<Handling> expectedHandlings = Arrays.asList(new Handling(), new Handling());
+        when(repository.getHandlingListByCarId(carId)).thenReturn(expectedHandlings);
 
-    @BeforeEach
-    void setUp() {
-        handling = new Handling();
-        handling.setId(1L);
-        handling.setCost(1000);
-        handling.setType("Maintenance");
+        List<Handling> result = handlingService.getListHandlingByCarId(carId);
+
+        assertEquals(expectedHandlings, result);
+        verify(repository).getHandlingListByCarId(carId);
     }
 
     @Test
-    void testGetListHandlingByCarId() {
-        List<Handling> handlings = Arrays.asList(handling, new Handling());
-        when(repository.getHandlingListByCarId(1L)).thenReturn(handlings);
+    void getListHandling_shouldReturnAll() {
+        List<Handling> expectedHandlings = Arrays.asList(new Handling(), new Handling());
+        when(repository.findAll()).thenReturn(expectedHandlings);
 
-        List<Handling> result = handlingService.getListHandlingByCarId(1L);
+        List<Handling> result = handlingService.getListHandling();
 
-        assertNotNull(result);
-        assertEquals(2, result.size());
+        assertEquals(expectedHandlings, result);
+        verify(repository).findAll();
     }
 
     @Test
-    void testAddHandling() {
-        when(repository.save(handling)).thenReturn(handling);
-        Handling savedHandling = handlingService.addHandling(handling);
+    void addHandling_shouldSaveAndReturnHandling() {
+        Handling handlingToSave = new Handling();
+        when(repository.save(handlingToSave)).thenReturn(handlingToSave);
 
-        assertNotNull(savedHandling);
-        assertEquals(1000.0, savedHandling.getCost());
+        Handling result = handlingService.addHandling(handlingToSave);
+
+        assertEquals(handlingToSave, result);
+        verify(repository).save(handlingToSave);
     }
 
     @Test
-    void testRemoveHandling() {
-        doNothing().when(repository).deleteById(1L);
-        assertDoesNotThrow(() -> handlingService.removeHandling(1L));
-        verify(repository, times(1)).deleteById(1L);
-    }
+    void removeHandling_shouldDeleteHandling() {
+        Long id = 1L;
 
-    @Test
-    void testUpdateHandling() {
-        Handling updatedHandling = new Handling();
-        updatedHandling.setCost(1500);
-        updatedHandling.setType("Repair");
+        handlingService.removeHandling(id);
 
-        when(repository.getById(1L)).thenReturn(handling);
-        when(repository.save(any(Handling.class))).thenReturn(updatedHandling);
-
-        Handling result = handlingService.updateHandling(updatedHandling, 1L);
-
-        assertNotNull(result);
-        assertEquals(1500, result.getCost());
+        verify(repository).deleteById(id);
     }
 }

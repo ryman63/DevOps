@@ -5,11 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="2389052a-3141-4345-ac7a-620dfbccb935" name="Changes" comment="backend v1.0">
-      <change afterPath="$PROJECT_DIR$/devops-backend/src/test/java/test/CarServiceTest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/devops-backend/src/test/java/test/HandlingServiceTest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/devops-backend/src/test/java/test/NotificationServiceTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/devops-backend/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/devops-backend/build.gradle" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/devops-backend/src/main/java/devops/model/Notification.java" beforeDir="false" afterPath="$PROJECT_DIR$/devops-backend/src/main/java/devops/model/Notification.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -51,7 +48,7 @@
         <entry key="$PROJECT_DIR$" value="master" />
       </map>
     </option>
-    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/devops-backend" />
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="GitHubPullRequestSearchHistory">{
   &quot;lastFilter&quot;: {
@@ -62,7 +59,7 @@
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
     &quot;url&quot;: &quot;https://github.com/ryman63/DevOps.git&quot;,
-    &quot;accountId&quot;: &quot;b89726cd-981b-48b8-bbc4-2d97462c5361&quot;
+    &quot;accountId&quot;: &quot;0edd3f73-509b-461e-991f-cfa68b2e512a&quot;
   }
 }</component>
   <component name="KubernetesApiPersistence">{}</component>
@@ -78,39 +75,40 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Gradle.Build DevOps.executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.CarServiceTest.executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.DevOps [testClasses].executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.DevOps.executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.HandlingServiceTest.executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.NotificationServiceTest.executor&quot;: &quot;Run&quot;,
-    &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
-    &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
-    &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
-    &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;Spring Boot.Main.executor&quot;: &quot;Run&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;backend&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/IdeaProjects/DevOps&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;onboarding.tips.debug.path&quot;: &quot;C:/IdeaProjects/DevOps/src/main/java/org/example/Main.java&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Gradle.Build DevOps.executor": "Run",
+    "Gradle.CarServiceTest.executor": "Run",
+    "Gradle.DevOps [testClasses].executor": "Run",
+    "Gradle.DevOps.executor": "Run",
+    "Gradle.HandlingServiceTest.executor": "Run",
+    "Gradle.NotificationServiceTest.executor": "Run",
+    "RequestMappingsPanelOrder0": "0",
+    "RequestMappingsPanelOrder1": "1",
+    "RequestMappingsPanelWidth0": "75",
+    "RequestMappingsPanelWidth1": "75",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "Spring Boot.Main.executor": "Run",
+    "git-widget-placeholder": "lab1",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "C:/Users/TBG/source/repos/DevOps",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "onboarding.tips.debug.path": "C:/IdeaProjects/DevOps/src/main/java/org/example/Main.java",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\IdeaProjects\DevOps" />
     </key>
   </component>
-  <component name="RunManager" selected="Gradle.DevOps [testClasses]">
+  <component name="RunManager" selected="Spring Boot.Main">
     <configuration name="DevOps [testClasses]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
         <option name="executionName" />
@@ -149,8 +147,8 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-jdk-9f38398b9061-39b83d9b5494-intellij.indexing.shared.core-IU-241.18034.62" />
-        <option value="bundled-js-predefined-1d06a55b98c1-0b3e54e931b4-JavaScript-IU-241.18034.62" />
+        <option value="bundled-jdk-9823dce3aa75-fdfe4dae3a2d-intellij.indexing.shared.core-IU-243.22562.145" />
+        <option value="bundled-js-predefined-d6986cc7102b-deb605915726-JavaScript-IU-243.22562.145" />
       </set>
     </attachedChunks>
   </component>
@@ -166,6 +164,8 @@
       <workItem from="1742409141198" duration="20944000" />
       <workItem from="1742452167458" duration="4904000" />
       <workItem from="1742458303267" duration="11000" />
+      <workItem from="1743866244959" duration="1320000" />
+      <workItem from="1743871046678" duration="119000" />
     </task>
     <task id="LOCAL-00001" summary="backend v1.0">
       <option name="closed" value="true" />

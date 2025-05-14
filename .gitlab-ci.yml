@@ -1,38 +1,61 @@
-image: gradle:8.6-jdk17-alpine
-
 stages:
-  - build-backend
-  - test-backend
-  - build-frontend
-  - test-frontend
+  - build
+  - test
 
-build-backend:
-  stage: build-backend
+# Сборка frontend
+build_frontend:
+  stage: build
+  image: node:18
+  working_directory: $CI_PROJECT_DIR/devops-front
   script:
-    - cd devops-backend
-    - ./gradlew assemble
-  artifacts:
-    paths:
-      - backend/build/libs/*.jar
-
-test-backend:
-  stage: test-backend
-  script:
-    - cd devops-backend
-    - ./gradlew check
-  dependencies:
-    - build-backend
-  artifacts:
-    when: always
-    reports:
-      junit: backend/build/test-results/test/**/TEST-*.xml
-
-build-frontend:
-  stage: build-frontend
-  script:
-    - cd devops-front
-    - npm install
+    - npm ci
     - npm run build
   artifacts:
     paths:
-      - frontend/dist/
+      - devops-front/build
+    expire_in: 1 hour
+  only:
+    changes:
+      - devops-front/**/*
+      - .gitlab-ci.yml
+
+# Сборка backend
+build_backend:
+  stage: build
+  image: gradle:8.10-jdk17
+  working_directory: $CI_PROJECT_DIR/devops-backend
+  script:
+    - ./gradlew build -x test
+  artifacts:
+    paths:
+      - devops-backend/build/libs
+    expire_in: 1 hour
+  only:
+    changes:
+      - devops-backend/**/*
+      - .gitlab-ci.yml
+
+# Тестирование frontend
+test_frontend:
+  stage: test
+  image: node:18
+  working_directory: $CI_PROJECT_DIR/devops-front
+  script:
+    - npm ci
+    - npm test -- --watchAll=false
+  only:
+    changes:
+      - devops-front/**/*
+      - .gitlab-ci.yml
+
+# Тестирование backend
+test_backend:
+  stage: test
+  image: gradle:8.5-jdk17
+  working_directory: $CI_PROJECT_DIR/devops-backend
+  script:
+    - gradle test
+  only:
+    changes:
+      - devops-backend/**/*
+      - .gitlab-ci.yml
