@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  # Бэкенд (Spring Boot)
+  backend:
+    build:
+      context: ./devops-backend
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8081"
+    env_file: .env
+    depends_on:
+      - postgres
+
+  # Фронтенд (React)
+  frontend:
+    build:
+      context: ./devops-front
+      dockerfile: Dockerfile
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+
+  # PostgreSQL
+  postgres:  # ← Выровнено под другие сервисы
+    image: postgres:15
+    env_file: .env
+    environment:
+      POSTGRES_USER: "${PG_USER}"
+      POSTGRES_PASSWORD: "${PG_PASS}"
+      POSTGRES_DB: "${PG_DB_NAME}"
+    ports:
+      - "54320:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  # pgAdmin
+  pgadmin:  # ← Выровнено под другие сервисы
+    image: dpage/pgadmin4
+    env_file: .env
+    environment:
+      PGADMIN_DEFAULT_EMAIL: "${PG_ADMIN_EMAIL}"
+      PGADMIN_DEFAULT_PASSWORD: "${PG_ADMIN_PASS}"
+    ports:
+      - "8081:80"
+    depends_on:
+      - postgres
+
+volumes:
+  postgres_data:
