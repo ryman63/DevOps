@@ -1,4 +1,7 @@
-FROM ubuntu:latest
-LABEL authors="Дмитрий"
+FROM eclipse-temurin:17-jdk-jammy
 
-ENTRYPOINT ["top", "-b"]
+WORKDIR /app
+COPY . .
+RUN ./gradlew clean build --no-daemon
+
+CMD ["java", "-jar", "build/libs/DevOps-1.0-SNAPSHOT.jar"]
