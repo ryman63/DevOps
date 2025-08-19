@@ -18,7 +18,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Install YC CLI (Windows)
-        shell: pwsh
+        shell: powershell
         run: |
           Invoke-WebRequest -Uri "https://storage.yandexcloud.net/yandexcloud-yc/install.ps1" -OutFile "install.ps1"
           .\install.ps1
@@ -27,7 +27,7 @@ jobs:
           yc config set container-registry.registry-id ${{ secrets.YC_REGISTRY_ID }}
 
       - name: Build frontend Docker image
-        shell: pwsh
+        shell: powershell
         run: |
           cd devops-front
           docker build -t cr.yandex/${{ secrets.YC_REGISTRY_ID }}/frontend:1.0.0 .
