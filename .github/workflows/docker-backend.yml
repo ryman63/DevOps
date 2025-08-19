@@ -14,22 +14,19 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Setup YC CLI
+      - name: Install YC CLI (Windows)
+        shell: pwsh
         run: |
-          curl -sSL https://storage.yandexcloud.net/yandexcloud-yc/install.sh | bash
+          Invoke-WebRequest -Uri "https://storage.yandexcloud.net/yandexcloud-yc/install.ps1" -OutFile "install.ps1"
+          .\install.ps1
           echo "${{ secrets.YC_SERVICE_ACCOUNT_KEY_JSON }}" > key.json
-          ./yc init --service-account-key key.json --profile default --non-interactive
-          ./yc config set container-registry.registry-id ${{ secrets.YC_REGISTRY_ID }}
+          yc init --service-account-key key.json --profile default --non-interactive
+          yc config set container-registry.registry-id ${{ secrets.YC_REGISTRY_ID }}
 
-      - name: Cd to backend folder
+      - name: Build backend Docker image
+        shell: pwsh
         run: |
           cd devops-backend
-
-      - name: Build Docker image
-        run: |
           docker build -t cr.yandex/${{ secrets.YC_REGISTRY_ID }}/backend:1.0.0 .
-
-      - name: Push Docker image
-        run: |
           docker push cr.yandex/${{ secrets.YC_REGISTRY_ID }}/backend:1.0.0
 
