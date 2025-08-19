@@ -23,11 +23,10 @@ jobs:
           Invoke-WebRequest -Uri "https://storage.yandexcloud.net/yandexcloud-yc/install.ps1" -OutFile "install.ps1"
           .\install.ps1
           # Сохраняем ключ из секретов
-          Set-Content -Path key.json -Value '${{ secrets.YC_SERVICE_ACCOUNT_KEY_JSON }}'
+          Set-Content -Path key.json -Value '${{ secrets.YC_SERVICE_ACCOUNT_KEY_JSON }}' -Encoding utf8
           # Авторизация
-          yc auth activate-service-account --key-file key.json
-          # Настройка registry
-          yc config set container-registry.registry-id ${{ secrets.YC_REGISTRY_ID }}
+          yc config profile create sa-profile
+          yc config set service-account-key key.json
 
       - name: Build backend Docker image
         shell: powershell
