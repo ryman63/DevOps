@@ -23,7 +23,8 @@ jobs:
           Invoke-WebRequest -Uri "https://storage.yandexcloud.net/yandexcloud-yc/install.ps1" -OutFile "install.ps1"
           .\install.ps1
           # Сохраняем ключ из секретов
-          [System.IO.File]::WriteAllText("key.json", '${{ secrets.YC_SERVICE_ACCOUNT_KEY_JSON }}', [System.Text.Encoding]::UTF8)
+          $bytes = [System.Text.Encoding]::UTF8.GetBytes('${{ secrets.YC_SERVICE_ACCOUNT_KEY_JSON }}')
+          [System.IO.File]::WriteAllBytes("key.json", $bytes)
           # Авторизация
           yc config profile create sa-profile
           yc config set service-account-key key.json
