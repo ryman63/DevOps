@@ -22,7 +22,8 @@ jobs:
         run: |
           Invoke-WebRequest -Uri "https://storage.yandexcloud.net/yandexcloud-yc/install.ps1" -OutFile "install.ps1"
           .\install.ps1
-          yc config profile create test
+          yc config profile create sa-profile
+          echo ${{ secrets.YC_OAUTH_TOKEN }}
           yc config set token ${{ secrets.YC_OAUTH_TOKEN }}
 
       - name: Build frontend Docker image
