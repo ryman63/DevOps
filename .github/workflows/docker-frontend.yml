@@ -26,12 +26,12 @@ jobs:
           .\install.ps1
 
       - name: Auth
-        shell: pwsh
+        shell: cmd
         env:
           SUPER_SECRET: ${{ secrets.YC_OAUTH_TOKEN }}
         run: |
-          yc config set token "$env:YC_OAUTH_TOKEN" --profile sa-profile
-          
+          yc config set token "%YC_OAUTH_TOKEN%" --profile sa-profile
+
       - name: Build frontend Docker image
         shell: powershell
         run: |
