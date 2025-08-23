@@ -19,6 +19,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
+      - name: Check Docker
+        shell: powershell
+        run: docker version
+
       - name: Install YC CLI (Windows)
         shell: powershell
         run: |
