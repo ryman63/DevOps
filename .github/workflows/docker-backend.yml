@@ -10,8 +10,6 @@ on:
 jobs:
   build-and-push:
     runs-on: self-hosted
-    env:
-      YC_OAUTH_TOKEN: ${{ secrets.YC_OAUTH_TOKEN }}
     defaults:
       run:
         shell: powershell
@@ -30,18 +28,18 @@ jobs:
           .\install.ps1
 
       - name: Auth
-        shell: cmd
+        shell: powershell
         env:
           YC_OAUTH_TOKEN: ${{ secrets.YC_OAUTH_TOKEN }}
         run: |
-          yc config set token "%YC_OAUTH_TOKEN%" --profile sa-profile
+          yc config set token ${{ secrets.YC_OAUTH_TOKEN }} --profile sa-profile
 
       - name: Build backend Docker image
-        shell: cmd
+        shell: powershell
         env:
           YC_REGISTRY_ID: ${{ secrets.YC_REGISTRY_ID }}
         run: |
           cd devops-backend
-          docker build -t cr.yandex/%YC_REGISTRY_ID%/backend:1.0.0 .
-          docker push cr.yandex/%YC_REGISTRY_ID%/backend:1.0.0
+          docker build -t cr.yandex/${{ secrets.YC_REGISTRY_ID }}/backend:1.0.0 .
+          docker push cr.yandex/${{ secrets.YC_REGISTRY_ID }}/backend:1.0.0
 
