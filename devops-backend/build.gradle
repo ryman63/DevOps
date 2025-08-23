@@ -52,13 +52,17 @@ jar {
     enabled = false
 }
 
-springBoot {
-    mainClass = 'devops.Main'
+bootJar {
+    manifest {
+        attributes(
+                'Main-Class': 'org.springframework.boot.loader.JarLauncher',
+                'Start-Class': 'devops.Main'
+        )
+    }
+    archiveFileName = 'app.jar' // Фиксированное имя
 }
 
-bootJar {
-    archiveFileName = 'app.jar' // Явно задаем имя JAR
-    manifest {
-        attributes 'Start-Class': 'devops.Main'
-    }
+// Убедитесь что это Spring Boot приложение
+springBoot {
+    mainClass = 'devops.Main'
 }

@@ -2,14 +2,18 @@ FROM eclipse-temurin:17-jdk-jammy
 
 WORKDIR /app
 
-# Сначала копируем только JAR файл
-COPY build/libs/*.jar app.jar
+# Копируем JAR
+COPY build/libs/app.jar app.jar
 
-# Проверяем манифест при сборке (опционально)
-RUN jar tf app.jar | grep META-INF/MANIFEST.MF || echo "Manifest check failed"
+# Проверяем что JAR скопировался
+RUN echo "Checking JAR file..." && \
+    ls -la /app/ && \
+    if [ -f /app/app.jar ]; then \
+        echo "JAR exists, checking manifest..." && \
+        jar tf /app/app.jar | grep MANIFEST.MF || echo "Manifest not found!"; \
+    else \
+        echo "ERROR: JAR file not found!"; \
+        exit 1; \
+    fi
 
 ENTRYPOINT ["java", "-jar", "/app/app.jar"]
-
-# Добавляем healthcheck для Kubernetes
-HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
-  CMD curl -f http://localhost:8080/actuator/health || exit 1

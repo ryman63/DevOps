@@ -41,22 +41,55 @@ jobs:
         run: |
           docker login -u oauth -p ${{ secrets.YC_OAUTH_TOKEN }} cr.yandex
 
-      - name: Verify JAR before build
+      - name: Build backend jar with diagnostics
         shell: powershell
         run: |
           cd devops-backend
-          $jarFile = (Get-ChildItem "build/libs/*.jar" | Select-Object -First 1).Name
-          Write-Host "Checking JAR: $jarFile"
           
-          # Проверяем манифест
-          jar xf "build/libs/$jarFile" META-INF/MANIFEST.MF
-          cat META-INF/MANIFEST.MF
-          rm META-INF/MANIFEST.MF
+          # Полная очистка
+          .\gradlew.bat clean
+          
+          # Удаляем старые JAR файлы
+          Remove-Item build/libs/*.jar -Force -ErrorAction SilentlyContinue
+          
+          # Сборка с выводом информации
+          .\gradlew.bat bootJar --info
+          
+          # Детальная диагностика
+          Write-Host "=== BUILD DIRECTORY CONTENTS ==="
+          Get-ChildItem build -Recurse | Format-Table Name, Length
+          
+          Write-Host "=== JAR FILES ==="
+          $jarFiles = Get-ChildItem "build/libs/*.jar"
+          if ($jarFiles) {
+              foreach ($jarFile in $jarFiles) {
+                  Write-Host "JAR: $($jarFile.Name), Size: $($jarFile.Length) bytes"
+                  
+                  # Проверяем манифест
+                  jar xf $jarFile.FullName META-INF/MANIFEST.MF
+                  if (Test-Path "META-INF/MANIFEST.MF") {
+                      Write-Host "=== MANIFEST for $($jarFile.Name) ==="
+                      Get-Content META-INF/MANIFEST.MF
+                      Remove-Item META-INF -Recurse -Force
+                  } else {
+                      Write-Host "ERROR: No manifest in $($jarFile.Name)"
+                  }
+              }
+          } else {
+              Write-Host "ERROR: No JAR files found!"
+              exit 1
+          }
 
-      - name: Build backend jar
+      - name: Verify JAR structure
+        shell: powershell
         run: |
           cd devops-backend
-          .\gradlew.bat clean bootJar
+          $jarFile = (Get-ChildItem "build/libs/*.jar" | Select-Object -First 1)
+          Write-Host "Checking JAR structure: $($jarFile.Name)"
+          
+          # Проверяем структуру JAR
+          jar tf $jarFile.FullName | Select-String "BOOT-INF" | Select-Object -First 10
+          jar tf $jarFile.FullName | Select-String "org/springframework/boot/loader" | Select-Object -First 5
 
       - name: Build backend Docker image
         shell: powershell
