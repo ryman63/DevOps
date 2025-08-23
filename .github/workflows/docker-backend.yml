@@ -53,32 +53,7 @@ jobs:
           Remove-Item build/libs/*.jar -Force -ErrorAction SilentlyContinue
           
           # Сборка с выводом информации
-          .\gradlew.bat bootJar --info
-          
-          # Детальная диагностика
-          Write-Host "=== BUILD DIRECTORY CONTENTS ==="
-          Get-ChildItem build -Recurse | Format-Table Name, Length
-          
-          Write-Host "=== JAR FILES ==="
-          $jarFiles = Get-ChildItem "build/libs/*.jar"
-          if ($jarFiles) {
-              foreach ($jarFile in $jarFiles) {
-                  Write-Host "JAR: $($jarFile.Name), Size: $($jarFile.Length) bytes"
-                  
-                  # Проверяем манифест
-                  jar xf $jarFile.FullName META-INF/MANIFEST.MF
-                  if (Test-Path "META-INF/MANIFEST.MF") {
-                      Write-Host "=== MANIFEST for $($jarFile.Name) ==="
-                      Get-Content META-INF/MANIFEST.MF
-                      Remove-Item META-INF -Recurse -Force
-                  } else {
-                      Write-Host "ERROR: No manifest in $($jarFile.Name)"
-                  }
-              }
-          } else {
-              Write-Host "ERROR: No JAR files found!"
-              exit 1
-          }
+          .\gradlew.bat bootJar
 
       - name: Build backend Docker image
         shell: powershell
