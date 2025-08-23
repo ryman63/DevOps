@@ -28,7 +28,6 @@ jobs:
         run: |
           Invoke-WebRequest -Uri "https://storage.yandexcloud.net/yandexcloud-yc/install.ps1" -OutFile "install.ps1"
           .\install.ps1
-          # Авторизация
 
       - name: Auth
         shell: cmd
