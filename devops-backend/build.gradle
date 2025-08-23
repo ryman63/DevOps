@@ -51,3 +51,7 @@ test {
 jar {
     enabled = false
 }
+
+springBoot {
+    mainClass = 'devops.Main'
+}
