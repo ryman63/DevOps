@@ -44,7 +44,7 @@ jobs:
       - name: Build backend jar
         run: |
           cd devops-backend
-          .\gradlew.bat clean build -x test --no-daemon
+          .\gradlew.bat clean bootJar
 
       - name: Build backend Docker image
         shell: powershell
