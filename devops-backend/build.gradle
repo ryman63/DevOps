@@ -55,3 +55,10 @@ jar {
 springBoot {
     mainClass = 'devops.Main'
 }
+
+bootJar {
+    archiveFileName = 'app.jar' // Явно задаем имя JAR
+    manifest {
+        attributes 'Start-Class': 'devops.Main'
+    }
+}

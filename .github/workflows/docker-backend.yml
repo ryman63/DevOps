@@ -41,6 +41,18 @@ jobs:
         run: |
           docker login -u oauth -p ${{ secrets.YC_OAUTH_TOKEN }} cr.yandex
 
+      - name: Verify JAR before build
+        shell: powershell
+        run: |
+          cd devops-backend
+          $jarFile = (Get-ChildItem "build/libs/*.jar" | Select-Object -First 1).Name
+          Write-Host "Checking JAR: $jarFile"
+          
+          # Проверяем манифест
+          jar xf "build/libs/$jarFile" META-INF/MANIFEST.MF
+          cat META-INF/MANIFEST.MF
+          rm META-INF/MANIFEST.MF
+
       - name: Build backend jar
         run: |
           cd devops-backend
