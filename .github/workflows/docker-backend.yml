@@ -51,8 +51,7 @@ jobs:
           
           # Сборка с выводом информации
           ./gradlew clean bootJar
-          ls build/libs/
-
+          
       - name: Build backend Docker image
         shell: powershell
         env:

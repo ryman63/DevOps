@@ -1,8 +1,7 @@
 FROM eclipse-temurin:21-jdk-alpine
 
-WORKDIR /app
+# Копируем fat JAR
+COPY build/libs/DevOps-1.0-SNAPSHOT.jar /app.jar
 
-COPY build/libs/*.jar app.jar
-
-
-ENTRYPOINT ["java", "-jar", "/app/app.jar"]
+# Запуск через Spring Boot loader
+ENTRYPOINT ["java", "-jar", "/app.jar"]
