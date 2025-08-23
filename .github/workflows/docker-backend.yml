@@ -25,7 +25,14 @@ jobs:
           Invoke-WebRequest -Uri "https://storage.yandexcloud.net/yandexcloud-yc/install.ps1" -OutFile "install.ps1"
           .\install.ps1
           # Авторизация
+
+      - name: Auth
+        shell: pwsh
+        env:
+          SUPER_SECRET: ${{ secrets.YC_OAUTH_TOKEN }}
+        run: |
           yc config set token "$env:YC_OAUTH_TOKEN" --profile sa-profile
+
       - name: Build backend Docker image
         shell: powershell
         run: |
