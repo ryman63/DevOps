@@ -46,14 +46,11 @@ jobs:
         run: |
           cd devops-backend
           
-          # Полная очистка
-          .\gradlew.bat clean
-          
           # Удаляем старые JAR файлы
           Remove-Item build/libs/*.jar -Force -ErrorAction SilentlyContinue
           
           # Сборка с выводом информации
-          .\gradlew.bat bootJar
+          .\gradlew.bat clean build
 
       - name: Build backend Docker image
         shell: powershell
