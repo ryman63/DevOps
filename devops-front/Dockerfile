@@ -4,7 +4,8 @@ FROM node:18-alpine as builder
 WORKDIR /app
 # Копируем только файлы зависимостей (оптимизация кэша)
 COPY package.json package-lock.json ./
-RUN npm ci
+RUN npm cache clean --force && npm ci
+
 # Копируем остальные файлы проекта
 COPY . .
 RUN npm run build

@@ -9,7 +9,7 @@ on:
 jobs:
   test-backend:
     name: Test Backend
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     defaults:
       run:
         working-directory: ./devops-backend
@@ -33,7 +33,7 @@ jobs:
 
   test-frontend:
     name: Test Frontend
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     defaults:
       run:
         working-directory: ./devops-front
