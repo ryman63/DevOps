@@ -35,3 +35,10 @@ dependencies {
     implementation 'jakarta.xml.bind:jakarta.xml.bind-api:4.0.0'
     runtimeOnly 'org.glassfish.jaxb:jaxb-runtime:4.0.3' // или другую реализацию JAXB
 }
+
+
+test {
+    useJUnitPlatform()
+    maxParallelForks = 1
+    jvmArgs "-Dfile.encoding=UTF-8"
+}

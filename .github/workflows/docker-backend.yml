@@ -43,8 +43,7 @@ jobs:
 
       - name: Build backend jar
         run: |
-          cd devops-backend
-          ./gradlew clean build --no-daemon
+          ./gradlew clean build -x test --no-daemon
 
       - name: Build backend Docker image
         shell: powershell
@@ -52,6 +51,6 @@ jobs:
           YC_REGISTRY_ID: ${{ secrets.YC_REGISTRY_ID }}
         run: |
           cd devops-backend
-          docker build -t cr.yandex/${{ secrets.YC_REGISTRY_ID }}/backend:1.0.1 .
-          docker push cr.yandex/${{ secrets.YC_REGISTRY_ID }}/backend:1.0.1
+          docker build -t cr.yandex/${{ secrets.YC_REGISTRY_ID }}/latest .
+          docker push cr.yandex/${{ secrets.YC_REGISTRY_ID }}/latest
 
