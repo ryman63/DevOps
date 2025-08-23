@@ -52,7 +52,6 @@ jobs:
           # Сборка с выводом информации
           ./gradlew clean bootJar
           ls build/libs/
-          jar tf build/libs/devops-backend-1.0-SNAPSHOT.jar | Select-String "postgresql"
 
       - name: Build backend Docker image
         shell: powershell
