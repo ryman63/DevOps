@@ -6,7 +6,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://backend:8080',  // Имя сервиса из docker-compose
+        target: 'http://localhost:8080',  // Имя сервиса из docker-compose
         changeOrigin: true,
       }
     }
