@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://backend.app.svc.cluster.local:8080', // Укажите ваш URL
+  baseURL: 'http://89.169.181.201:30080', // Укажите ваш URL
 });
 
 // Контроллер машин

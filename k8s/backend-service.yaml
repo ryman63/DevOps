@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+  namespace: app
+spec:
+  selector:
+    app: backend
+  type: NodePort
+  ports:
+    - port: 8080        # порт внутри кластера
+      targetPort: 8080  # порт контейнера
+      nodePort: 30080   # порт на узле (обязателен для доступа извне)
