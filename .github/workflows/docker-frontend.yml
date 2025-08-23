@@ -41,7 +41,7 @@ jobs:
         env:
           YC_REGISTRY_ID: ${{ secrets.YC_OAUTH_TOKEN }}
         run: |
-          echo ${{ secrets.YC_OAUTH_TOKEN }}|docker login --username oauth --password-stdin cr.yandex
+          docker login -u oauth -p ${{ secrets.YC_OAUTH_TOKEN }} cr.yandex
 
       - name: Build frontend Docker image
         shell: powershell
