@@ -41,6 +41,11 @@ jobs:
         run: |
           docker login -u oauth -p ${{ secrets.YC_OAUTH_TOKEN }} cr.yandex
 
+      - name: Build backend jar
+        run: |
+          cd devops-backend
+          ./gradlew clean build --no-daemon
+
       - name: Build backend Docker image
         shell: powershell
         env:
