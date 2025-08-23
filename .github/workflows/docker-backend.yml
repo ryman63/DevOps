@@ -50,8 +50,8 @@ jobs:
           Remove-Item build/libs/*.jar -Force -ErrorAction SilentlyContinue
           
           # Сборка с выводом информации
-          .\gradlew.bat clean build -x test
-
+          ./gradlew clean bootJar
+          
       - name: Build backend Docker image
         shell: powershell
         env:
