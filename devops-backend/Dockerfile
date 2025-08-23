@@ -1,6 +1,7 @@
 FROM eclipse-temurin:17-jdk-jammy
 
 WORKDIR /app
-COPY build/libs/DevOps-1.0-SNAPSHOT.jar app.jar
+COPY . .
+RUN ./gradlew clean build -x test --no-daemon
 
-CMD ["java", "-jar", "app.jar"]
+CMD ["java", "-jar", "build/libs/DevOps-1.0-SNAPSHOT.jar"]
