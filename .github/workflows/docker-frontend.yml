@@ -49,5 +49,5 @@ jobs:
           YC_REGISTRY_ID: ${{ secrets.YC_REGISTRY_ID }}
         run: |
           cd devops-front
-          docker build -t cr.yandex/${{ secrets.YC_REGISTRY_ID }}/frontend:1.0.2 .
-          docker push cr.yandex/${{ secrets.YC_REGISTRY_ID }}/frontend:1.0.2
+          docker build -t cr.yandex/${{ secrets.YC_REGISTRY_ID }}/frontend:1.0.3 .
+          docker push cr.yandex/${{ secrets.YC_REGISTRY_ID }}/frontend:1.0.3
