@@ -80,17 +80,6 @@ jobs:
               exit 1
           }
 
-      - name: Verify JAR structure
-        shell: powershell
-        run: |
-          cd devops-backend
-          $jarFile = (Get-ChildItem "build/libs/*.jar" | Select-Object -First 1)
-          Write-Host "Checking JAR structure: $($jarFile.Name)"
-          
-          # Проверяем структуру JAR
-          jar tf $jarFile.FullName | Select-String "BOOT-INF" | Select-Object -First 10
-          jar tf $jarFile.FullName | Select-String "org/springframework/boot/loader" | Select-Object -First 5
-
       - name: Build backend Docker image
         shell: powershell
         env:
