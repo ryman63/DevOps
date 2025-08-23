@@ -42,6 +42,6 @@ jobs:
           YC_REGISTRY_ID: ${{ secrets.YC_REGISTRY_ID }}
         run: |
           cd devops-backend
-          docker build -t cr.yandex/"%YC_REGISTRY_ID%"/backend:1.0.0 .
-          docker push cr.yandex/"%YC_REGISTRY_ID%"/backend:1.0.0
+          docker build -t cr.yandex/%YC_REGISTRY_ID%/backend:1.0.0 .
+          docker push cr.yandex/%YC_REGISTRY_ID%/backend:1.0.0
 
