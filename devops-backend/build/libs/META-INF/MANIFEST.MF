@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
-Main-Class: devops.Main
+Main-Class: org.springframework.boot.loader.launch.JarLauncher
 Start-Class: devops.Main
 Spring-Boot-Version: 3.2.0
 Spring-Boot-Classes: BOOT-INF/classes/

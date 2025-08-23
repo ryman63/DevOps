@@ -48,10 +48,6 @@ test {
     jvmArgs "-Dfile.encoding=UTF-8"
 }
 
-bootJar {
-    manifest {
-        attributes(
-            'Main-Class': 'devops.Main'
-        )
-    }
+jar {
+    enabled = false
 }
