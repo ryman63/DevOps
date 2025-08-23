@@ -19,6 +19,7 @@ spec:
         imagePullPolicy: Always
         ports:
         - containerPort: 8080
+        command: ["java", "-jar", "/app.jar"]
         resources:
           requests:
             cpu: "100m"

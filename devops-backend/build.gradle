@@ -42,3 +42,11 @@ test {
     maxParallelForks = 1
     jvmArgs "-Dfile.encoding=UTF-8"
 }
+
+jar {
+    manifest {
+        attributes(
+                'Main-Class': 'devops.Main'
+        )
+    }
+}
