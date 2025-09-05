@@ -23,18 +23,7 @@ jobs:
         shell: powershell
         run: docker version
 
-      - name: Install YC CLI (Windows)
-        shell: powershell
-        run: |
-          Invoke-WebRequest -Uri "https://storage.yandexcloud.net/yandexcloud-yc/install.ps1" -OutFile "install.ps1"
-          .\install.ps1
 
-      - name: YC auth
-        shell: powershell
-        env:
-          YC_OAUTH_TOKEN: ${{ secrets.YC_OAUTH_TOKEN }}
-        run: |
-          yc config set token ${{ secrets.YC_OAUTH_TOKEN }} --profile sa-profile
 
       - name: Docker auth
         shell: powershell
