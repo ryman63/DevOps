@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://158.160.168.152:8080',
+  baseURL: 'http://158.160.168.152:80',
 });
 
 // Контроллер машин
