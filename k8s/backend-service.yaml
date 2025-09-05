@@ -6,8 +6,7 @@ metadata:
 spec:
   selector:
     app: backend
-  type: NodePort
   ports:
-    - port: 8080        # порт внутри кластера
-      targetPort: 8080  # порт контейнера
-      nodePort: 30080   # порт на узле (обязателен для доступа извне)
+    - port: 8080
+      targetPort: 8080
+  type: ClusterIP

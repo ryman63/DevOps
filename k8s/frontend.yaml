@@ -25,6 +25,8 @@ kind: Service
 metadata:
   name: frontend
   namespace: app
+  annotations:
+    service.beta.kubernetes.io/yandex-load-balancer-type: "external"
 spec:
   selector:
     app: frontend
