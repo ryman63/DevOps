@@ -9,8 +9,8 @@ on:
 env:
   REGISTRY_ID: crpujm33eb95rpi44h2p
   REGISTRY_LOGIN: json_key
-  IMAGE_BACKEND: cr.yandex/${{ env.REGISTRY_ID }}/devops-backend
-  IMAGE_FRONTEND: cr.yandex/${{ env.REGISTRY_ID }}/devops-frontend
+  IMAGE_BACKEND: cr.yandex/crpujm33eb95rpi44h2p/devops-backend
+  IMAGE_FRONTEND: cr.yandex/crpujm33eb95rpi44h2p/devops-frontend
 
 jobs:
   # Этап 1: Сборка и тестирование Backend
