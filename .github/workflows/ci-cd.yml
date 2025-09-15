@@ -2,9 +2,10 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ main, develop, sonarqube-integration ]
   pull_request:
-    branches: [ main ]
+    branches: [ main, sonarqube-integration ]
+  workflow_dispatch:
 
 env:
   REGISTRY_ID: crpujm33eb95rpi44h2p
