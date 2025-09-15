@@ -1,0 +1,204 @@
+#cloud-config
+package_update: true
+package_upgrade: true
+
+packages:
+  - curl
+  - wget
+  - git
+  - unzip
+  - htop
+  - ufw
+
+runcmd:
+  # Установка Docker
+  - curl -fsSL https://get.docker.com -o get-docker.sh
+  - sh get-docker.sh
+  - usermod -aG docker ubuntu
+  - rm get-docker.sh
+  
+  # Установка Docker Compose
+  - curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+  - chmod +x /usr/local/bin/docker-compose
+  
+  # Создание директории проекта
+  - mkdir -p /home/ubuntu/devops-project
+  - cd /home/ubuntu/devops-project
+  
+  # Настройка файрвола
+  - ufw --force enable
+  - ufw allow ssh
+  - ufw allow 80
+  - ufw allow 443
+  - ufw allow 8080
+  - ufw allow 8081
+  - ufw allow 9000
+  
+  # Создание docker-compose.prod.yml
+  - |
+    cat > docker-compose.prod.yml << 'EOF'
+    services:
+      backend:
+        image: abuzer337/devops-backend:latest
+        ports:
+          - "8080:8080"
+        environment:
+          SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres:5432/to_db"
+          SPRING_DATASOURCE_USERNAME: "root"
+          SPRING_DATASOURCE_PASSWORD: "root"
+          SPRING_DATASOURCE_DRIVER_CLASS_NAME: "org.postgresql.Driver"
+          SPRING_JPA_HIBERNATE_DDL_AUTO: "update"
+          SERVER_PORT: "8080"
+        depends_on:
+          - postgres
+        restart: unless-stopped
+
+      frontend:
+        image: abuzer337/devops-frontend:latest
+        ports:
+          - "80:80"
+        depends_on:
+          - backend
+        restart: unless-stopped
+
+      postgres:
+        image: postgres:15
+        environment:
+          POSTGRES_USER: "root"
+          POSTGRES_PASSWORD: "root"
+          POSTGRES_DB: "to_db"
+        ports:
+          - "5432:5432"
+        volumes:
+          - postgres_data:/var/lib/postgresql/data
+        healthcheck:
+          test: ["CMD-SHELL", "pg_isready -U root -d to_db"]
+          interval: 10s
+          timeout: 5s
+          retries: 5
+        restart: unless-stopped
+
+      pgadmin:
+        image: dpage/pgadmin4
+        environment:
+          PGADMIN_DEFAULT_EMAIL: "admin@example.com"
+          PGADMIN_DEFAULT_PASSWORD: "admin"
+        ports:
+          - "8081:80"
+        depends_on:
+          postgres:
+            condition: service_healthy
+        restart: unless-stopped
+
+      sonarqube:
+        image: sonarqube:community
+        ports:
+          - "9000:9000"
+        environment:
+          SONAR_ES_BOOTSTRAP_CHECKS_DISABLE: "true"
+        volumes:
+          - sonarqube_data:/opt/sonarqube/data
+          - sonarqube_logs:/opt/sonarqube/logs
+          - sonarqube_extensions:/opt/sonarqube/extensions
+        restart: unless-stopped
+
+    volumes:
+      postgres_data:
+      sonarqube_data:
+      sonarqube_logs:
+      sonarqube_extensions:
+    EOF
+  
+  # Скачивание образов Docker
+  - docker pull abuzer337/devops-backend:latest
+  - docker pull abuzer337/devops-frontend:latest
+  - docker pull postgres:15
+  - docker pull dpage/pgadmin4
+  - docker pull sonarqube:community
+  
+  # Запуск приложения
+  - cd /home/ubuntu/devops-project
+  - docker-compose -f docker-compose.prod.yml up -d
+  
+  # Создание скрипта для управления
+  - |
+    cat > /home/ubuntu/manage-app.sh << 'EOF'
+    #!/bin/bash
+    cd /home/ubuntu/devops-project
+    
+    case "$1" in
+        start)
+            echo "🚀 Запуск приложения..."
+            docker-compose -f docker-compose.prod.yml up -d
+            ;;
+        stop)
+            echo "⏹️ Остановка приложения..."
+            docker-compose -f docker-compose.prod.yml down
+            ;;
+        restart)
+            echo "🔄 Перезапуск приложения..."
+            docker-compose -f docker-compose.prod.yml restart
+            ;;
+        status)
+            echo "📊 Статус сервисов:"
+            docker-compose -f docker-compose.prod.yml ps
+            ;;
+        logs)
+            echo "📋 Логи сервисов:"
+            docker-compose -f docker-compose.prod.yml logs
+            ;;
+        update)
+            echo "🔄 Обновление образов..."
+            docker-compose -f docker-compose.prod.yml pull
+            docker-compose -f docker-compose.prod.yml up -d
+            ;;
+        *)
+            echo "Использование: $0 {start|stop|restart|status|logs|update}"
+            echo ""
+            echo "Команды:"
+            echo "  start   - Запустить приложение"
+            echo "  stop    - Остановить приложение"
+            echo "  restart - Перезапустить приложение"
+            echo "  status  - Показать статус сервисов"
+            echo "  logs    - Показать логи"
+            echo "  update  - Обновить и перезапустить"
+            exit 1
+            ;;
+    esac
+    EOF
+  
+  - chmod +x /home/ubuntu/manage-app.sh
+  - chown ubuntu:ubuntu /home/ubuntu/manage-app.sh
+
+write_files:
+  - path: /home/ubuntu/welcome.txt
+    content: |
+      🎉 DevOps приложение успешно развернуто!
+      
+      🌐 Доступ к сервисам:
+      - Frontend: http://YOUR_VM_IP
+      - Backend API: http://YOUR_VM_IP:8080
+      - pgAdmin: http://YOUR_VM_IP:8081 (admin@example.com / admin)
+      - SonarQube: http://YOUR_VM_IP:9000
+      
+      🔧 Управление приложением:
+      - ./manage-app.sh start    - Запустить
+      - ./manage-app.sh stop     - Остановить
+      - ./manage-app.sh restart  - Перезапустить
+      - ./manage-app.sh status   - Статус
+      - ./manage-app.sh logs     - Логи
+      - ./manage-app.sh update   - Обновить
+      
+      📊 Мониторинг:
+      - docker ps                - Список контейнеров
+      - docker stats             - Статистика ресурсов
+      - htop                     - Системные ресурсы
+    owner: ubuntu:ubuntu
+    permissions: '0644'
+
+final_message: |
+  🚀 DevOps приложение развернуто!
+  Проверьте /home/ubuntu/welcome.txt для получения информации о доступе.
+
+
+

@@ -1,0 +1,42 @@
+name: CI Build and Push Docker Image
+
+on:
+  push:
+    branches:
+      - main
+      - lab3
+  pull_request:
+
+jobs:
+  build-and-push:
+     runs-on: self-hosted
+     env:
+      YC_OAUTH_TOKEN: ${{ secrets.YC_OAUTH_TOKEN }}
+     defaults:
+      run:
+        shell: powershell
+     steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Check Docker
+        shell: powershell
+        run: docker version
+
+
+
+      - name: Docker auth
+        shell: powershell
+        env:
+          YC_REGISTRY_ID: ${{ secrets.YC_OAUTH_TOKEN }}
+        run: |
+          docker login -u oauth -p ${{ secrets.YC_OAUTH_TOKEN }} cr.yandex
+
+      - name: Build frontend Docker image
+        shell: powershell
+        env:
+          YC_REGISTRY_ID: ${{ secrets.YC_REGISTRY_ID }}
+        run: |
+          cd devops-front
+          docker build -t cr.yandex/${{ secrets.YC_REGISTRY_ID }}/frontend:1.0.4 .
+          docker push cr.yandex/${{ secrets.YC_REGISTRY_ID }}/frontend:1.0.4

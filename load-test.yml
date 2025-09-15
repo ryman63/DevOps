@@ -1,0 +1,45 @@
+config:
+  target: '{{ $processEnvironment.BACKEND_URL }}'
+  phases:
+    - duration: 60
+      arrivalRate: 5
+      name: "Warm up"
+    - duration: 120
+      arrivalRate: 10
+      name: "Ramp up load"
+    - duration: 300
+      arrivalRate: 20
+      name: "Sustained load"
+    - duration: 60
+      arrivalRate: 5
+      name: "Ramp down"
+
+scenarios:
+  - name: "API Health Check"
+    weight: 30
+    flow:
+      - get:
+          url: "/actuator/health"
+          expect:
+            - statusCode: 200
+
+  - name: "Get Cars"
+    weight: 40
+    flow:
+      - get:
+          url: "/api/cars"
+          expect:
+            - statusCode: 200
+
+  - name: "Add Car"
+    weight: 30
+    flow:
+      - post:
+          url: "/api/cars"
+          json:
+            brand: "Test Brand {{ $randomString() }}"
+            model: "Test Model {{ $randomString() }}"
+            year: "{{ $randomInt(1990, 2024) }}"
+          expect:
+            - statusCode: 201
+

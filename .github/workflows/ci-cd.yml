@@ -1,0 +1,324 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  REGISTRY_ID: crpujm33eb95rpi44h2p
+  REGISTRY_LOGIN: json_key
+  IMAGE_BACKEND: cr.yandex/${{ env.REGISTRY_ID }}/devops-backend
+  IMAGE_FRONTEND: cr.yandex/${{ env.REGISTRY_ID }}/devops-frontend
+
+jobs:
+  # Этап 1: Сборка и тестирование Backend
+  backend-test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up JDK 11
+      uses: actions/setup-java@v3
+      with:
+        java-version: '11'
+        distribution: 'temurin'
+    
+    - name: Cache Gradle packages
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+        restore-keys: |
+          ${{ runner.os }}-gradle-
+    
+    - name: Make gradlew executable
+      run: chmod +x ./devops-backend/gradlew
+    
+    - name: Run tests with coverage
+      run: |
+        cd devops-backend
+        ./gradlew clean test jacocoTestReport
+    
+    - name: Upload coverage reports
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./devops-backend/build/reports/jacoco/test/jacocoTestReport.xml
+        flags: backend
+        name: backend-coverage
+
+  # Этап 2: Сборка и тестирование Frontend
+  frontend-test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: devops-front/package-lock.json
+    
+    - name: Install dependencies
+      run: |
+        cd devops-front
+        npm ci
+    
+    - name: Run tests with coverage
+      run: |
+        cd devops-front
+        npm test -- --coverage --watchAll=false
+    
+    - name: Upload coverage reports
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./devops-front/coverage/lcov.info
+        flags: frontend
+        name: frontend-coverage
+
+  # Этап 3: SonarQube анализ
+  sonarqube-analysis:
+    runs-on: ubuntu-latest
+    needs: [backend-test, frontend-test]
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+    
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+    
+    - name: Cache SonarQube packages
+      uses: actions/cache@v3
+      with:
+        path: ~/.sonar/cache
+        key: ${{ runner.os }}-sonar-${{ hashFiles('**/build.gradle') }}
+        restore-keys: ${{ runner.os }}-sonar-
+    
+    - name: Cache Gradle packages
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+        restore-keys: |
+          ${{ runner.os }}-gradle-
+    
+    - name: Make gradlew executable
+      run: chmod +x ./devops-backend/gradlew
+    
+    - name: Build and test Backend
+      run: |
+        cd devops-backend
+        ./gradlew clean build -x jacocoTestCoverageVerification
+    
+    - name: SonarQube Backend Analysis
+      uses: sonarqube-quality-gate-action@v1.0.3
+      timeout-minutes: 5
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+      with:
+        scanMetadataReportFile: devops-backend/target/sonar/report-task.txt
+        args: >
+          -Dsonar.projectKey=devops-backend
+          -Dsonar.organization=devops-org
+          -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }}
+          -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+          -Dsonar.projectName=DevOps Backend
+          -Dsonar.projectVersion=1.0.0
+          -Dsonar.sources=src/main/java
+          -Dsonar.tests=src/test/java
+          -Dsonar.java.binaries=build/classes
+          -Dsonar.java.libraries=build/libs/*.jar
+          -Dsonar.coverage.jacoco.xmlReportPaths=build/reports/jacoco/test/jacocoTestReport.xml
+          -Dsonar.junit.reportPaths=build/test-results/test
+          -Dsonar.qualitygate.wait=true
+          -Dsonar.qualitygate.timeout=300
+          -Dsonar.exclusions=**/generated/**,**/target/**,**/build/**
+          -Dsonar.test.exclusions=**/test/**,**/tests/**
+          -Dsonar.java.source=17
+          -Dsonar.java.target=17
+          -Dsonar.verbose=true
+    
+    - name: Install Frontend dependencies
+      run: |
+        cd devops-front
+        npm ci
+    
+    - name: Build Frontend
+      run: |
+        cd devops-front
+        npm run build
+    
+    - name: SonarQube Frontend Analysis
+      run: |
+        cd devops-front
+        npm install -g sonar-scanner
+        sonar-scanner \
+          -Dsonar.projectKey=devops-frontend \
+          -Dsonar.organization=devops-org \
+          -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }} \
+          -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
+          -Dsonar.projectName=DevOps Frontend \
+          -Dsonar.projectVersion=1.0.0 \
+          -Dsonar.sources=src \
+          -Dsonar.tests=src \
+          -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info \
+          -Dsonar.exclusions=**/node_modules/**,**/dist/**,**/build/** \
+          -Dsonar.test.exclusions=**/test/**,**/tests/**,**/*.test.js,**/*.spec.js
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+  # Этап 4: Сборка Docker образов
+  build-images:
+    runs-on: ubuntu-latest
+    needs: [sonarqube-analysis]
+    if: github.ref == 'refs/heads/main'
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+    
+    - name: Log in to Yandex Container Registry
+      uses: docker/login-action@v2
+      with:
+        registry: cr.yandex
+        username: ${{ env.REGISTRY_LOGIN }}
+        password: ${{ secrets.REGISTRY_PASSWORD }}
+    
+    - name: Extract metadata for Backend
+      id: meta-backend
+      uses: docker/metadata-action@v4
+      with:
+        images: ${{ env.IMAGE_BACKEND }}
+        tags: |
+          type=ref,event=branch
+          type=ref,event=pr
+          type=sha,prefix={{branch}}-
+          type=raw,value=latest,enable={{is_default_branch}}
+    
+    - name: Extract metadata for Frontend
+      id: meta-frontend
+      uses: docker/metadata-action@v4
+      with:
+        images: ${{ env.IMAGE_FRONTEND }}
+        tags: |
+          type=ref,event=branch
+          type=ref,event=pr
+          type=sha,prefix={{branch}}-
+          type=raw,value=latest,enable={{is_default_branch}}
+    
+    - name: Build and push Backend image
+      uses: docker/build-push-action@v4
+      with:
+        context: ./devops-backend
+        push: true
+        tags: ${{ steps.meta-backend.outputs.tags }}
+        labels: ${{ steps.meta-backend.outputs.labels }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+    
+    - name: Build and push Frontend image
+      uses: docker/build-push-action@v4
+      with:
+        context: ./devops-front
+        push: true
+        tags: ${{ steps.meta-frontend.outputs.tags }}
+        labels: ${{ steps.meta-frontend.outputs.labels }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+  # Этап 5: Развертывание в Kubernetes
+  deploy:
+    runs-on: ubuntu-latest
+    needs: [build-images]
+    if: github.ref == 'refs/heads/main'
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Yandex Cloud CLI
+      run: |
+        curl -sSL https://storage.yandexcloud.net/yandexcloud-yc/install.sh | bash
+        echo "$HOME/yandex-cloud/bin" >> $GITHUB_PATH
+    
+    - name: Configure Yandex Cloud CLI
+      run: |
+        echo "${{ secrets.YC_SERVICE_ACCOUNT_KEY }}" | yc config set service-account-key -
+        yc config set cloud-id ${{ secrets.YC_CLOUD_ID }}
+        yc config set folder-id ${{ secrets.YC_FOLDER_ID }}
+    
+    - name: Get Kubernetes credentials
+      run: |
+        yc managed-kubernetes cluster get-credentials --id ${{ secrets.K8S_CLUSTER_ID }} --external
+    
+    - name: Update Kubernetes manifests
+      run: |
+        # Обновляем версию образа в манифестах
+        sed -i "s|abuzer337/devops-backend:.*|${{ env.IMAGE_BACKEND }}:latest|g" k8s-backend.yaml
+        sed -i "s|abuzer337/devops-frontend:.*|${{ env.IMAGE_FRONTEND }}:latest|g" k8s-frontend.yaml
+    
+    - name: Deploy to Kubernetes
+      run: |
+        kubectl apply -f k8s-namespace.yaml
+        kubectl apply -f k8s-configmap.yaml
+        kubectl apply -f k8s-postgres.yaml
+        kubectl wait --for=condition=ready pod -l app=postgres -n devops-app --timeout=300s
+        kubectl apply -f k8s-backend.yaml
+        kubectl apply -f k8s-frontend.yaml
+        kubectl apply -f k8s-hpa.yaml
+    
+    - name: Verify deployment
+      run: |
+        kubectl get pods -n devops-app
+        kubectl get services -n devops-app
+        kubectl get hpa -n devops-app
+
+  # Этап 6: Нагрузочное тестирование
+  load-test:
+    runs-on: ubuntu-latest
+    needs: [deploy]
+    if: github.ref == 'refs/heads/main'
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+    
+    - name: Install Artillery
+      run: npm install -g artillery
+    
+    - name: Wait for deployment
+      run: sleep 120
+    
+    - name: Run load tests
+      run: |
+        artillery run load-test.yml
+      env:
+        BACKEND_URL: ${{ secrets.BACKEND_URL }}
+    
+    - name: Upload test results
+      uses: actions/upload-artifact@v3
+      with:
+        name: load-test-results
+        path: artillery-report.html
+

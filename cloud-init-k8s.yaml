@@ -1,0 +1,384 @@
+#cloud-config
+package_update: true
+package_upgrade: true
+
+packages:
+  - curl
+  - wget
+  - git
+  - unzip
+  - htop
+  - ufw
+  - apt-transport-https
+  - ca-certificates
+  - gnupg
+  - lsb-release
+
+runcmd:
+  # Установка Docker
+  - curl -fsSL https://get.docker.com -o get-docker.sh
+  - sh get-docker.sh
+  - usermod -aG docker ubuntu
+  - rm get-docker.sh
+  
+  # Установка Docker Compose
+  - curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+  - chmod +x /usr/local/bin/docker-compose
+  
+  # Установка kubectl
+  - curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+  - chmod +x kubectl
+  - mv kubectl /usr/local/bin/
+  
+  # Установка minikube
+  - curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+  - install minikube-linux-amd64 /usr/local/bin/minikube
+  - rm minikube-linux-amd64
+  
+  # Настройка файрвола
+  - ufw --force enable
+  - ufw allow ssh
+  - ufw allow 80
+  - ufw allow 443
+  - ufw allow 8080
+  - ufw allow 30000:32767/tcp  # Kubernetes NodePort range
+  
+  # Создание директории проекта
+  - mkdir -p /home/ubuntu/devops-k8s
+  - cd /home/ubuntu/devops-k8s
+  
+  # Создание Kubernetes манифестов
+  - |
+    cat > namespace.yaml << 'EOF'
+    apiVersion: v1
+    kind: Namespace
+    metadata:
+      name: devops-app
+    EOF
+  
+  - |
+    cat > configmap.yaml << 'EOF'
+    apiVersion: v1
+    kind: ConfigMap
+    metadata:
+      name: devops-config
+      namespace: devops-app
+    data:
+      SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres-service:5432/to_db"
+      SPRING_DATASOURCE_USERNAME: "root"
+      SPRING_DATASOURCE_PASSWORD: "root"
+      TELEGRAM_BOT_TOKEN: "8214582880:AAFnIB94F9bH-m6SNRNR9ktGph5lGW_ZSZs"
+      TELEGRAM_CHAT_ID: "931340901"
+    EOF
+  
+  - |
+    cat > postgres.yaml << 'EOF'
+    apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      name: postgres-pvc
+      namespace: devops-app
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 1Gi
+    ---
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: postgres
+      namespace: devops-app
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          app: postgres
+      template:
+        metadata:
+          labels:
+            app: postgres
+        spec:
+          containers:
+            - name: postgres
+              image: postgres:15
+              ports:
+                - containerPort: 5432
+              env:
+                - name: POSTGRES_DB
+                  value: "to_db"
+                - name: POSTGRES_USER
+                  value: "root"
+                - name: POSTGRES_PASSWORD
+                  value: "root"
+              volumeMounts:
+                - name: postgres-storage
+                  mountPath: /var/lib/postgresql/data
+                  subPath: postgres
+          volumes:
+            - name: postgres-storage
+              persistentVolumeClaim:
+                claimName: postgres-pvc
+    ---
+    apiVersion: v1
+    kind: Service
+    metadata:
+      name: postgres-service
+      namespace: devops-app
+    spec:
+      selector:
+        app: postgres
+      ports:
+        - protocol: TCP
+          port: 5432
+          targetPort: 5432
+      type: ClusterIP
+    EOF
+  
+  - |
+    cat > backend.yaml << 'EOF'
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: devops-backend
+      namespace: devops-app
+    spec:
+      replicas: 2
+      selector:
+        matchLabels:
+          app: devops-backend
+      template:
+        metadata:
+          labels:
+            app: devops-backend
+        spec:
+          containers:
+            - name: devops-backend
+              image: abuzer337/devops-backend:latest
+              ports:
+                - containerPort: 8080
+              envFrom:
+                - configMapRef:
+                    name: devops-config
+              resources:
+                requests:
+                  memory: "512Mi"
+                  cpu: "250m"
+                limits:
+                  memory: "1Gi"
+                  cpu: "500m"
+              livenessProbe:
+                httpGet:
+                  path: /actuator/health
+                  port: 8080
+                initialDelaySeconds: 60
+                periodSeconds: 10
+              readinessProbe:
+                httpGet:
+                  path: /actuator/health
+                  port: 8080
+                initialDelaySeconds: 30
+                periodSeconds: 5
+    ---
+    apiVersion: v1
+    kind: Service
+    metadata:
+      name: devops-backend-service
+      namespace: devops-app
+    spec:
+      selector:
+        app: devops-backend
+      ports:
+        - port: 8080
+          targetPort: 8080
+      type: NodePort
+    EOF
+  
+  - |
+    cat > frontend.yaml << 'EOF'
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: devops-frontend
+      namespace: devops-app
+    spec:
+      replicas: 2
+      selector:
+        matchLabels:
+          app: devops-frontend
+      template:
+        metadata:
+          labels:
+            app: devops-frontend
+        spec:
+          containers:
+            - name: devops-frontend
+              image: abuzer337/devops-frontend:latest
+              ports:
+                - containerPort: 80
+              resources:
+                requests:
+                  memory: "128Mi"
+                  cpu: "100m"
+                limits:
+                  memory: "256Mi"
+                  cpu: "200m"
+    ---
+    apiVersion: v1
+    kind: Service
+    metadata:
+      name: devops-frontend-service
+      namespace: devops-app
+    spec:
+      selector:
+        app: devops-frontend
+      ports:
+        - port: 80
+          targetPort: 80
+      type: NodePort
+    EOF
+  
+  - |
+    cat > hpa.yaml << 'EOF'
+    apiVersion: autoscaling/v2
+    kind: HorizontalPodAutoscaler
+    metadata:
+      name: devops-backend-hpa
+      namespace: devops-app
+    spec:
+      scaleTargetRef:
+        apiVersion: apps/v1
+        kind: Deployment
+        name: devops-backend
+      minReplicas: 2
+      maxReplicas: 10
+      metrics:
+        - type: Resource
+          resource:
+            name: cpu
+            target:
+              type: Utilization
+              averageUtilization: 15
+    EOF
+  
+  # Запуск minikube
+  - minikube start --driver=docker --cpus=2 --memory=4096
+  - minikube addons enable metrics-server
+  
+  # Ожидание готовности minikube
+  - sleep 30
+  
+  # Применение манифестов Kubernetes
+  - kubectl apply -f namespace.yaml
+  - kubectl apply -f configmap.yaml
+  - kubectl apply -f postgres.yaml
+  - sleep 30  # Ожидание PostgreSQL
+  - kubectl apply -f backend.yaml
+  - kubectl apply -f frontend.yaml
+  - kubectl apply -f hpa.yaml
+  
+  # Создание скрипта для управления
+  - |
+    cat > /home/ubuntu/manage-k8s.sh << 'EOF'
+    #!/bin/bash
+    cd /home/ubuntu/devops-k8s
+
+    case "$1" in
+        start)
+            echo "🚀 Запуск minikube..."
+            minikube start --driver=docker
+            echo "📦 Применение манифестов..."
+            kubectl apply -f namespace.yaml
+            kubectl apply -f configmap.yaml
+            kubectl apply -f postgres.yaml
+            sleep 30
+            kubectl apply -f backend.yaml
+            kubectl apply -f frontend.yaml
+            kubectl apply -f hpa.yaml
+            ;;
+        stop)
+            echo "⏹️ Остановка minikube..."
+            minikube stop
+            ;;
+        restart)
+            echo "🔄 Перезапуск minikube..."
+            minikube stop
+            minikube start --driver=docker
+            ;;
+        status)
+            echo "📊 Статус minikube:"
+            minikube status
+            echo ""
+            echo "📊 Статус подов:"
+            kubectl get pods -n devops-app
+            echo ""
+            echo "📊 Статус сервисов:"
+            kubectl get services -n devops-app
+            echo ""
+            echo "📊 Статус HPA:"
+            kubectl get hpa -n devops-app
+            ;;
+        logs)
+            echo "📋 Логи backend:"
+            kubectl logs -f deployment/devops-backend -n devops-app
+            ;;
+        dashboard)
+            echo "🌐 Открытие dashboard..."
+            minikube dashboard
+            ;;
+        urls)
+            echo "🌐 URL сервисов:"
+            echo "Frontend: $(minikube service devops-frontend-service -n devops-app --url)"
+            echo "Backend: $(minikube service devops-backend-service -n devops-app --url)"
+            ;;
+        *)
+            echo "Использование: $0 {start|stop|restart|status|logs|dashboard|urls}"
+            echo ""
+            echo "Команды:"
+            echo "  start     - Запустить minikube и приложение"
+            echo "  stop      - Остановить minikube"
+            echo "  restart   - Перезапустить minikube"
+            echo "  status    - Показать статус"
+            echo "  logs      - Показать логи backend"
+            echo "  dashboard - Открыть Kubernetes dashboard"
+            echo "  urls      - Показать URL сервисов"
+            exit 1
+            ;;
+    esac
+    EOF
+
+  - chmod +x /home/ubuntu/manage-k8s.sh
+  - chown ubuntu:ubuntu /home/ubuntu/manage-k8s.sh
+
+write_files:
+  - path: /home/ubuntu/welcome-k8s.txt
+    content: |
+      🎉 DevOps приложение развернуто в Kubernetes!
+
+      🌐 Доступ к сервисам:
+      - Frontend: $(minikube service devops-frontend-service -n devops-app --url)
+      - Backend API: $(minikube service devops-backend-service -n devops-app --url)
+
+      🔧 Управление приложением:
+      - ./manage-k8s.sh start     - Запустить
+      - ./manage-k8s.sh stop      - Остановить
+      - ./manage-k8s.sh restart   - Перезапустить
+      - ./manage-k8s.sh status    - Статус
+      - ./manage-k8s.sh logs      - Логи
+      - ./manage-k8s.sh dashboard - Dashboard
+      - ./manage-k8s.sh urls      - URL сервисов
+
+      📊 Полезные команды:
+      - kubectl get pods -n devops-app          - Список подов
+      - kubectl get services -n devops-app      - Список сервисов
+      - kubectl get hpa -n devops-app           - Статус авт scaling
+      - minikube dashboard                      - Kubernetes dashboard
+      - minikube service list                   - Список сервисов
+    owner: ubuntu:ubuntu
+    permissions: '0644'
+
+final_message: |
+  🚀 DevOps приложение развернуто в Kubernetes!
+  Проверьте /home/ubuntu/welcome-k8s.txt для получения информации о доступе.
+
